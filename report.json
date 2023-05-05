@@ -1,0 +1,32 @@
+{
+    "scan_info": {
+      "start_time": "2022-06-01 12:00:00 UTC",
+      "end_time": "2022-06-01 12:30:00 UTC",
+      "duration": 1800
+    },
+    "warnings": [
+      {
+        "warning_type": "Cross-Site Scripting",
+        "warning_code": 0,
+        "fingerprint": "d1e6c7b0348e1f581d95e289a285f0519e2e07afceaa159bf83a19ed6c4b6f4c",
+        "message": "Possible XSS on line 2: User input in search_params is not properly escaped.",
+        "confidence": "High",
+        "line": 2,
+        "file": "app/controllers/actions_controller.rb",
+        "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting/",
+        "code": "search_params = params[:search].gsub(/[^0-9A-Za-z]/, '')"
+      },
+      {
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "3f61f7c0150d75e2a814a81213b22e7d55e285f826fb7b79af2948da83d36cc6",
+        "message": "Possible SQL injection on line 7: SQL query built using string concatenation.",
+        "confidence": "High",
+        "line": 7,
+        "file": "app/controllers/users_controller.rb",
+        "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "User.find_by_sql('SELECT * FROM users WHERE username = ' + params[:username])"
+      }
+    ]
+  }
+  

@@ -1,0 +1,30 @@
+version: '1.0'
+
+stages:
+  - checkout_code
+  - lint
+  - security_scan
+
+steps:
+  main_clone:
+    title: Clone main repository
+    type: git-clone
+    repo: https://github.com/kfface/WMcasestudy.git
+    revision: ${{ BRANCH_TAG }}
+  
+  lint:
+    title: 'RuboCop Lint'
+    image: ruby:latest
+    comands:
+      - gem install rubocop
+      -rubocop -a .
+      #the -a here allows for automatic style correction
+  
+  security_scan:
+    title: 'Brakeman Dependency Scan'
+    image: ruby:latest
+    commands:
+      - gem install brakeman
+      - brakeman -o report.json
+      - python3 bmparser.py report.json
+      - python3 pullrequest.py vulnerabilites.csv

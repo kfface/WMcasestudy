@@ -1,0 +1,55 @@
+version: '1.0'
+
+steps:
+  main_clone:
+    title: Clone main repository
+    type: git-clone
+    repo: https://github.com/kfface/WMcasestudy.git
+    revision: ${{CF_REVISION}}
+
+  build:
+    title: Build Docker image
+    type: build
+    image_name: kfface/WMcasestudy
+    working_directory: ./path/to/Dockerfile
+    tag: '${{CF_BRANCH_NAME}}'
+
+  zap_scan:
+    title: OWASP ZAP API Scan
+    type: composition
+    composition:
+      version: '2'
+      services:
+        zap:
+          image: owasp/zap2docker-stable
+          ports:
+            - '8080:8080'
+          environment:
+            - API_KEY=your-api-key
+            - TARGET_URL=http://WMcasestudy
+            - ZAP_PORT=8080
+            - ZAP_API_KEY=your-api-key
+            - ZAP_HEADLESS=true
+            - ZAP_ATTACK_MODE=true
+          command: zap-api-scan.py -t ${TARGET_URL} -f openapi -O -z '-config api.disablekey=true' -r zap_report.html
+      steps:
+        - title: Wait for ZAP to start
+          type: freestyle
+          command: sleep 30
+        - title: Run ZAP scan
+          type: freestyle
+          command: |
+            zap-cli --zap-url http://localhost:8080/ -p 8080 openapi.load \
+              --spec ${{CF_VOLUME_PATH}}/openapi.yaml \
+              --name 'WMcasestudy' \
+              --hook=/zap-api-scan.py \
+              --hook-timeout=300000 \
+              --hook-retry-amount=5 \
+              --hook-retry-wait=60000
+
+  publish:
+    title: Publish Docker image
+    type: push
+    candidate: kfface/WMcasestudy:${{CF_BRANCH_NAME}}
+    registry: docker.io
+    tag: '${{CF_BRANCH_NAME}}'
