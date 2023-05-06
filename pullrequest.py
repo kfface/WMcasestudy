@@ -3,13 +3,13 @@ import json
 import sys
 import csv
 import requests
-    
-def read_vulnerabilities():
-    with open(sys.argv[1], 'r', encoding='utf-8') as csvfile:
+import os
+
+def read_vulnerabilities(v_list):
+    with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
-        vulnerabilities = []
         for row in reader:
-            vulnerabilities.append(row)
+            v_list.append(row[0])
     return vulnerabilities
 
 def create_pr(v):
@@ -40,5 +40,9 @@ def create_pr(v):
         else:
             print(f"Error creating pull request: {response.status_code} - {response.text}")
 
-vulnerabilities = read_vulnerabilities()
+vulnerabilities = []
+read_vulnerabilities(vulnerabilities)
+if not vulnerabilities:
+    sys.exit(1)
+print(vulnerabilities)
 create_pr(vulnerabilities)
