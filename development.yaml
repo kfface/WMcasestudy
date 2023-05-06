@@ -4,6 +4,7 @@ stages:
   - checkout_code
   - lint
   - security_scan
+  - deploy_to_eks
 
 steps:
   main_clone:
@@ -15,6 +16,7 @@ steps:
   lint:
     title: 'RuboCop Lint'
     image: ruby:latest
+    working directory: ./ruby_directory
     comands:
       - gem install rubocop
       -rubocop -a .
@@ -28,3 +30,18 @@ steps:
       - brakeman -o report.json
       - python3 bmparser.py report.json
       - python3 pullrequest.py vulnerabilites.csv
+        continue-on-error: true
+  
+  deploy_to_eks:
+  type: eks-bluegreen-deploy
+  arguments:
+    AWS_DEFAULT_REGION: 'us-west-2'
+    AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
+    AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
+    CLUSTER_NAME: WMcasestudy_cluster
+    SERVICE_NAME: WMcasestudy
+    IMAGE: 'WMcasestudy:latest'
+    CODEDEPLOY_APPLICATION: 'AppEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+    CODEDEPLOY_DEPLOYMENT_GROUP: 'DgpEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+    MAX_WAIT_TIME: 60
+
