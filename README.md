@@ -18,6 +18,8 @@ The second Python script, pullrequest.py, takes vulnerabilities.csv as an argume
 
 An essential aspect of DevSecOps is automatically gathering useful data, analyzing it, and using it to create a better pipeline. For the next step, SMTP is used to send the CSV file to a security analyst, who can monitor which vulnerabilities are recurring. We can then teach our developers to be more cautious with these vulnerabilities and/or implement tools in their IDEs to catch these vulnerabilities and require their remediation before PR creation.
 
+Staging: The staging workflow begins with a full OWASP ZAP scan, a dynamic application security testing (DAST) tool that spins up a testing environment for our new code/application. The environment should ideally be similar to production, allowing us to see how our new code/app interacts with all our other microservices. This scan generates another JSON output with vulnerabilities that we can parse and remediate in the same way as in the development workflow.
+
 It's important to continuously monitor and manage risk throughout the SDLC for this reason I have chosen to use a blue/green environment which allows for great agilitiy and more frequent deployments while reducing risk as much as possible.
 We can implement this by monitoring the number (and idealy severity) of known vulnerabilities, I have set this value to an environment variable which can be used to automatically deploy to blue/green environments based on the agility of the pipeline and the risk acceptance of the security team.
 
