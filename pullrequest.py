@@ -28,12 +28,15 @@ def read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file):
                     vulnerabilities.append(row[0])
     return vulnerabilities
         
-def create_pr(v):
-    for prtitle in v:
+def create_pr(vuln):
+    for prtitle in vuln:
+        branch_name = prtitle.split()[:2]
+        branch_name = branch_name[0] + branch_name[1]
+        branch_name = ''.join(char for char in branch_name if char.isalnum())
         url = "https://api.github.com/repos/kfface/WMcasestudy/pulls"
         title = prtitle
         body = "Please fix this vulnerabilitiy"
-        head = make a good branch title can't have spaces and special characters
+        head = branch_name
         base = "main"
         token = "<YOUR-TOKEN>"
 
@@ -56,16 +59,16 @@ def create_pr(v):
         else:
             print(f"Error creating pull request: {response.status_code} - {response.text}")
 
-def write_known_vulnerabilities(vulnerabilities, check_file):
-    if not check_file:
+def write_known_vulnerabilities(vuln, c_f):
+    if not c_f:
         with open('knownVulnerabilities.csv', 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
-            for item in vulnerabilities:
+            for item in vuln:
                 writer.writerow([item])
     else:
         with open('knownVulnerabilities.csv', 'a', encoding='utf-8') as f:
             writer = csv.writer(f)
-            for item in vulnerabilities:
+            for item in vuln:
                 writer.writerow([item])
 
 vulnerabilities = []

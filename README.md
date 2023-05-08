@@ -12,7 +12,6 @@ SUBMIT
 
 write a discription of EVERYTHING few sentences for everythin.
 and environment variables to do rolling eks deployment
-fix branch name in pr function
 add comments
 remove print statements
-gmail smtp rellay
+make sure files are arguments not hardcoded in py files
