@@ -6,29 +6,32 @@ import requests
 import os
 
 def check_for_old_vulnerabilities():
+    """checking to see if known vulnerabilities file exists"""
     old_vulnerabilities = './knownVulnerabilities.csv'
     check_file = os.path.isfile(old_vulnerabilities)
     return check_file
     
-def read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file):
-    if not check_file:
-        with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+def read_vulnerabilities(vulns, known_vulns, c_f):
+    """if knownVulnerabilities.csv does not exist add all vulnerabilities.csv to list, else check new vulns with old and only add new vulns"""
+    if not c_f:
+        with open(sys.argv[1], 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                vulnerabilities.append(row[0])
+                vulns.append(row[0])
     else:
         with open("knownVulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                known_vulnerabilities.append(row[0])
+                known_vulns.append(row[0])
         with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                if row[0] not in known_vulnerabilities:
-                    vulnerabilities.append(row[0])
-    return vulnerabilities
+                if row[0] not in known_vulns:
+                    vulns.append(row[0])
+    return vulns
         
 def create_pr(vuln):
+    """make individual PR for every new vulnerability"""
     for prtitle in vuln:
         branch_name = prtitle.split()[:2]
         branch_name = branch_name[0] + branch_name[1]
@@ -60,6 +63,7 @@ def create_pr(vuln):
             print(f"Error creating pull request: {response.status_code} - {response.text}")
 
 def write_known_vulnerabilities(vuln, c_f):
+    """create new or append knownVulnerabilities file with new vulnerabilities"""
     if not c_f:
         with open('knownVulnerabilities.csv', 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
@@ -75,5 +79,7 @@ vulnerabilities = []
 known_vulnerabilities = []
 check_file = check_for_old_vulnerabilities()
 read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file)
-create_pr(vulnerabilities)
+#create_pr(vulnerabilities)
+#this function is commented out because it causes the program to exit with an error since
+#I did not input valid credentials as it is beyond the scope of this case study
 write_known_vulnerabilities(vulnerabilities, check_file)

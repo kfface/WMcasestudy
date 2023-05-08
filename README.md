@@ -15,3 +15,4 @@ and environment variables to do rolling eks deployment
 add comments
 remove print statements
 make sure files are arguments not hardcoded in py files
+add usage to py files
