@@ -72,8 +72,5 @@ vulnerabilities = []
 known_vulnerabilities = []
 check_file = check_for_old_vulnerabilities()
 read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file)
-if not vulnerabilities:
-    sys.exit(1)
-print(vulnerabilities)
 create_pr(vulnerabilities)
 write_known_vulnerabilities(vulnerabilities, check_file)
