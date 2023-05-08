@@ -11,8 +11,8 @@ The pipeline then calls two Python scripts. The first one, bmparser.py, takes re
 
 The second Python script, pullrequest.py, takes vulnerabilities.csv as an argument and performs the bulk of the remediation in four steps:
 1. Checking for the existence of knownVulnerabilities.csv, which will be created at the end of this function to maintain consistency in the CI/CD pipeline.
-2a. If knownVulnerabilities.csv does not exist, vulnerabilities.csv is read in its entirety, and each vulnerability and line number are added to a list.
-2b. If knownVulnerabilities.csv exists, vulnerabilities.csv is cross-referenced against the list of known vulnerabilities, and only new vulnerabilities are added to the list.
+2. If knownVulnerabilities.csv does not exist, vulnerabilities.csv is read in its entirety, and each vulnerability and line number are added to a list.
+If knownVulnerabilities.csv exists, vulnerabilities.csv is cross-referenced against the list of known vulnerabilities, and only new vulnerabilities are added to the list.
 3. Creating an individual pull request (PR) for each new error found, with the PR title as the name and location of the error and the branch name as the first two words of the PR title (special characters and spaces are removed). Each issue is handled as an individual PR to ensure prompt remediation and separation of concerns.
 4. Once the PRs are sent, the list of new vulnerabilities is either appended (if knownVulnerabilities.csv exists) or a new file is created labeled as knownVulnerabilities.csv. This step is crucial because PRs are sent for individual vulnerabilities, and we want to make sure that known vulnerabilities are taken into account. When a vulnerability is patched, it must be removed from knownVulnerabilities.csv (automatically via a Python script), and new PRs should not be created for vulnerabilities that were previously sent through the pipeline.
 
