@@ -1,19 +1,20 @@
 version: '1.0'
 
 stages:
-  - checkout_code
-  - lint
-  - security_scan
-  - deploy_to_eks
+  - MainClone
+  - Lint
+  - SecurityScan
+  - SendEmail
+  - DeployToEks
 
 steps:
-  main_clone:
+  MainClone:
     title: Clone main repository
     type: git-clone
     repo: https://github.com/kfface/WMcasestudy.git
     revision: ${{ BRANCH_TAG }}
   
-  lint:
+  Lint:
     title: 'RuboCop Lint'
     image: ruby:latest
     working directory: ./ruby_directory
@@ -22,7 +23,7 @@ steps:
       -rubocop -a .
       #the -a here allows for automatic style correction
   
-  security_scan:
+  SecurityScan:
     title: 'Brakeman Dependency Scan'
     image: ruby:latest
     commands:
@@ -31,17 +32,35 @@ steps:
       - python3 bmparser.py report.json
       - python3 pullrequest.py vulnerabilites.csv
         continue-on-error: true
+    volumes:
+      - .codefresh/volume
+
+  SendEmail:
+    type: smtp
+    arguments:
+      TO: user@wm.com
+      FROM: databot@wm.com
+      SUBJECT: 'Build for ${{WMcasestudy}}'
+      BODY: '<html><a href="${{codfresh.io/WMcasestudy/id={uniquecodefreshid}}}">Here is your requested data</a></html>'
+      MIME_TYPE: html
+      SMTP_SERVER: smtp.domain.com
+      SMTP_USERNAME: databot@wm.com
+      SMTP_PASSWORD: ${{ password }}
+      ATTACHMENTS:
+      - path: ./knownVulnerabilities.csv
+
   
-  deploy_to_eks:
-  type: eks-bluegreen-deploy
-  arguments:
-    AWS_DEFAULT_REGION: 'us-west-2'
-    AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
-    AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
-    CLUSTER_NAME: WMcasestudy_cluster
-    SERVICE_NAME: WMcasestudy
-    IMAGE: 'WMcasestudy:latest'
-    CODEDEPLOY_APPLICATION: 'AppEKS-${WMcasestudy_cluster}-${WMcasestudy}'
-    CODEDEPLOY_DEPLOYMENT_GROUP: 'DgpEKS-${WMcasestudy_cluster}-${WMcasestudy}'
-    MAX_WAIT_TIME: 60
+  DeployToEks:
+    type: eks-bluegreen-deploy
+    arguments:
+      AWS_DEFAULT_REGION: 'us-west-2'
+      AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
+      AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
+      CLUSTER_NAME: WMcasestudy_cluster
+      SERVICE_NAME: WMcasestudy
+      IMAGE: 'WMcasestudy:latest'
+      CODEDEPLOY_APPLICATION: 'AppEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+      CODEDEPLOY_DEPLOYMENT_GROUP: 'DgpEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+      MAX_WAIT_TIME: 60
+    when:
 

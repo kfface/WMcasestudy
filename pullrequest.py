@@ -5,20 +5,36 @@ import csv
 import requests
 import os
 
-def read_vulnerabilities(v_list):
-    with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            v_list.append(row[0])
+def check_for_old_vulnerabilities():
+    old_vulnerabilities = './knownVulnerabilities.csv'
+    check_file = os.path.isfile(old_vulnerabilities)
+    return check_file
+    
+def read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file):
+    if not check_file:
+        with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                vulnerabilities.append(row[0])
+    else:
+        with open("knownVulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                known_vulnerabilities.append(row[0])
+        with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                if row[0] not in known_vulnerabilities:
+                    vulnerabilities.append(row[0])
     return vulnerabilities
-
+        
 def create_pr(v):
     for prtitle in v:
         url = "https://api.github.com/repos/kfface/WMcasestudy/pulls"
         title = prtitle
-        body = "Please pull these awesome changes in!"
-        head = "octocat:new-feature"
-        base = "master"
+        body = "Please fix this vulnerabilitiy"
+        head = make a good branch title can't have spaces and special characters
+        base = "main"
         token = "<YOUR-TOKEN>"
 
         headers = {
@@ -40,9 +56,21 @@ def create_pr(v):
         else:
             print(f"Error creating pull request: {response.status_code} - {response.text}")
 
+def write_known_vulnerabilities(vulnerabilities, check_file):
+    if not check_file:
+        with open('knownVulnerabilities.csv', 'w', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            for item in vulnerabilities:
+                writer.writerow([item])
+    else:
+        with open('knownVulnerabilities.csv', 'a', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            for item in vulnerabilities:
+                writer.writerow([item])
+
 vulnerabilities = []
-read_vulnerabilities(vulnerabilities)
-if not vulnerabilities:
-    sys.exit(1)
-print(vulnerabilities)
+known_vulnerabilities = []
+check_file = check_for_old_vulnerabilities()
+read_vulnerabilities(vulnerabilities, known_vulnerabilities, check_file)
 create_pr(vulnerabilities)
+write_known_vulnerabilities(vulnerabilities, check_file)

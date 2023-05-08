@@ -1,5 +1,9 @@
 version: '1.0'
 
+stages:
+  - main_clone
+  - zap_scan
+
 steps:
   main_clone:
     title: Clone main repository
@@ -7,24 +11,8 @@ steps:
     repo: https://github.com/kfface/WMcasestudy.git
     revision: ${{CF_REVISION}}
 
-  build:
-    title: Build Docker image
-    type: build
-    image_name: kfface/WMcasestudy
-    working_directory: ./path/to/Dockerfile
-    tag: 'latest'
-
-  Docker-Build:
-  title: Building docker image
-  type: build
-  working_directory: ./ruby_directory
-  arguments:
-    image_name: '${{kfface}}/${{WMcasestudy}}'
-    tag: latest
-
-
   zap_scan:
-    title: OWASP ZAP API Scan
+    title: OWASP ZAP FULL Scan
     type: composition
     composition:
       version: '2'
@@ -35,12 +23,12 @@ steps:
             - '8080:8080'
           environment:
             - API_KEY=your-api-key
-            - TARGET_URL=http://WMcasestudy
+            - TARGET_URL=http://WMcasestudy.com
             - ZAP_PORT=8080
             - ZAP_API_KEY=your-api-key
             - ZAP_HEADLESS=true
             - ZAP_ATTACK_MODE=true
-          command: zap-api-scan.py -t ${TARGET_URL} -f openapi -O -z '-config api.disablekey=true' -r zap_report.json --output-format json
+          command: zap-full-scan.py -t ${TARGET_URL} -f openapi -O -z '-config api.disablekey=true' -r zap_report.json --output-format json
       steps:
         - title: Wait for ZAP to start
           type: freestyle
@@ -51,14 +39,8 @@ steps:
             zap-cli --zap-url http://localhost:8080/ -p 8080 openapi.load \
               --spec kfface/WMcasestudy/latest/openapi.yaml \
               --name 'WMcasestudy' \
-              --hook=/zap-api-scan.py \
+              --hook=/zap-full-scan.py \
               --hook-timeout=300000 \
               --hook-retry-amount=5 \
               --hook-retry-wait=60000
 
-  publish:
-    title: Publish Docker image
-    type: push
-    candidate: kfface/WMcasestudy:latest
-    registry: docker.io
-    tag: 'latest'

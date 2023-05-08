@@ -1,6 +1,5 @@
 """Output security errors from brakeman"""
 import json
-import sys
 import csv
 
 vulnerabilities_output = []
