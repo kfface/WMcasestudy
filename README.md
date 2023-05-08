@@ -1,10 +1,13 @@
 Inside this repo I had to create some test files to mimic test output to ensure proper script function these can be found in /output.
 Here is a list of the essential files that fullfill the requirements of the case study, the rest can be ignored:
+
 Diagram
 - WMCaseStudyDiagram.jpeg
+
 Workflows
 - development.yaml
 - staging.yaml
+
 Scripts
 - bmparser.py
 - pullrequest.py
