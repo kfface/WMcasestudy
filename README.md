@@ -1,3 +1,12 @@
+Inside this repo I had to create some test files to mimic test output to ensure proper script function.
+Here is a list of the essential files that fullfill the requirements of the case study, the rest can be ignored:
+workflows
+- development.yaml
+- staging.yaml
+scripts
+- bmparser.py
+- pullrequest.py
+
 Write-up:
 
 Assumptions:
