@@ -7,7 +7,7 @@ Assumptions:
 Development Workflow:
 The development workflow begins with Rubocop linting, using the -a argument for automatic remediation of formatting issues. Once the code is formatted, the pipeline moves on to the Brakeman security scan, which generates a report.json output in JSON format for automated processes.
 
-The pipeline then calls two Python files. The first one, bmparser.py, takes report.json as an argument and performs three steps: (1) reading the Brakeman report, (2) parsing the report to create a list of vulnerabilities with their names and line numbers, and (3) creating a CSV file with the title and line number for use in the next Python script.
+The pipeline then calls two Python scripts. The first one, bmparser.py, takes report.json as an argument and performs three steps: (1) reading the Brakeman report, (2) parsing the report to create a list of vulnerabilities with their names and line numbers, and (3) creating a CSV file with the title and line number for use in the next Python script.
 
 The second Python script, pullrequest.py, takes vulnerabilities.csv as an argument and performs the bulk of the remediation in four steps:
 1. Checking for the existence of knownVulnerabilities.csv, which will be created at the end of this function to maintain consistency in the CI/CD pipeline.
