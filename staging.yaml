@@ -1,17 +1,19 @@
 version: '1.0'
 
 stages:
-  - main_clone
-  - zap_scan
+  - MainClone
+  - ZapScan
+  - SetEnvironmentVar
+  - DeployToEKS
 
 steps:
-  main_clone:
+  MainClone:
     title: Clone main repository
     type: git-clone
     repo: https://github.com/kfface/WMcasestudy.git
     revision: ${{CF_REVISION}}
 
-  zap_scan:
+  ZapScan:
     title: OWASP ZAP FULL Scan
     type: composition
     composition:
@@ -43,4 +45,27 @@ steps:
               --hook-timeout=300000 \
               --hook-retry-amount=5 \
               --hook-retry-wait=60000
+
+  SetEnvironmentVar:
+    title: Set vulnerability count variable
+    image: alpine:3.12
+    commands:
+      - VULN_COUNT=$(wc -l < knownVulnerabilities.csv)
+  
+  DeployToEks:
+    type: eks-bluegreen-deploy
+    arguments:
+      AWS_DEFAULT_REGION: 'us-west-2'
+      AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
+      AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
+      CLUSTER_NAME: WMcasestudy_cluster
+      SERVICE_NAME: WMcasestudy
+      IMAGE: 'WMcasestudy:latest'
+      CODEDEPLOY_APPLICATION: 'AppEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+      CODEDEPLOY_DEPLOYMENT_GROUP: 'DgpEKS-${WMcasestudy_cluster}-${WMcasestudy}'
+      MAX_WAIT_TIME: 60
+    when:
+      condition:
+        all:
+          - ${{ env.VULN_COUNT }} < 5
 
