@@ -5,7 +5,6 @@ stages:
   - Lint
   - SecurityScan
   - SendEmail
-  - DeployToEks
 
 steps:
   MainClone:
@@ -31,7 +30,6 @@ steps:
       - brakeman -o report.json
       - python3 bmparser.py report.json
       - python3 pullrequest.py vulnerabilites.csv
-        continue-on-error: true
     volumes:
       - .codefresh/volume
 
@@ -49,22 +47,3 @@ steps:
       ATTACHMENTS:
       - path: ./knownVulnerabilities.csv
 
-  
-  DeployToEks:
-    type: eks-bluegreen-deploy
-    arguments:
-      AWS_DEFAULT_REGION: 'us-west-2'
-      AWS_ACCESS_KEY_ID: '${{AWS_ACCESS_KEY_ID}}'
-      AWS_SECRET_ACCESS_KEY: '${{AWS_SECRET_ACCESS_KEY}}'
-      CLUSTER_NAME: WMcasestudy_cluster
-      SERVICE_NAME: WMcasestudy
-      IMAGE: 'WMcasestudy:latest'
-      CODEDEPLOY_APPLICATION: 'AppEKS-${WMcasestudy_cluster}-${WMcasestudy}'
-      CODEDEPLOY_DEPLOYMENT_GROUP: 'DgpEKS-${WMcasestudy_cluster}-${WMcasestudy}'
-      MAX_WAIT_TIME: 60
-    when:
-      condition:
-        all:
-          - '${{CF_BRANCH_TAG_NORMALIZED}} =~ /^release-.*$/'
-          - '${{CF_PULL_REQUEST_NUMBER}} = ""'
-          - ${{ env.VULNERABILITIES }} < 5
