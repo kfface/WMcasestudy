@@ -23,7 +23,7 @@ def parse(b_r, output):
 
 def create_csv(output):
     """make csv of vulnerabilities to pass to next function"""
-    with open('vulnerabilities.csv', 'w', encoding='utf-8') as f:
+    with open('output/vulnerabilities.csv', 'w', encoding='utf-8') as f:
         writer = csv.writer(f)
         for item in output:
             writer.writerow([item])

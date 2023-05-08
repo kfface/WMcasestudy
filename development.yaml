@@ -27,9 +27,9 @@ steps:
     image: ruby:latest
     commands:
       - gem install brakeman
-      - brakeman -o report.json
-      - python3 bmparser.py report.json
-      - python3 pullrequest.py vulnerabilites.csv
+      - brakeman -o output/report.json
+      - python3 bmparser.py output/report.json
+      - python3 pullrequest.py output/vulnerabilites.csv
     volumes:
       - .codefresh/volume
 

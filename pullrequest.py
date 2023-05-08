@@ -7,7 +7,7 @@ import os
 
 def check_for_old_vulnerabilities():
     """checking to see if known vulnerabilities file exists"""
-    old_vulnerabilities = './knownVulnerabilities.csv'
+    old_vulnerabilities = './output/knownVulnerabilities.csv'
     check_file = os.path.isfile(old_vulnerabilities)
     return check_file
     
@@ -19,11 +19,11 @@ def read_vulnerabilities(vulns, known_vulns, c_f):
             for row in reader:
                 vulns.append(row[0])
     else:
-        with open("knownVulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+        with open("output/knownVulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 known_vulns.append(row[0])
-        with open("vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
+        with open("output/vulnerabilities.csv", 'r', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row[0] not in known_vulns:
@@ -65,12 +65,12 @@ def create_pr(vuln):
 def write_known_vulnerabilities(vuln, c_f):
     """create new or append knownVulnerabilities file with new vulnerabilities"""
     if not c_f:
-        with open('knownVulnerabilities.csv', 'w', encoding='utf-8') as f:
+        with open('output/knownVulnerabilities.csv', 'w', encoding='utf-8') as f:
             writer = csv.writer(f)
             for item in vuln:
                 writer.writerow([item])
     else:
-        with open('knownVulnerabilities.csv', 'a', encoding='utf-8') as f:
+        with open('output/knownVulnerabilities.csv', 'a', encoding='utf-8') as f:
             writer = csv.writer(f)
             for item in vuln:
                 writer.writerow([item])
