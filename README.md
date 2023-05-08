@@ -1,4 +1,5 @@
 Write-up:
+
 Assumptions:
 1. This pipeline is a mature one, and scanners and linters have been optimized to minimize false positives.
 2. A script has been written to remove remediated vulnerabilities from knownVulnerabilities.csv. (this could be done quickly by making a few tweaks to my current algorithms but did not think it necessary to repeat myself for this case study)
