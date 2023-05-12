@@ -45,5 +45,5 @@ steps:
       SMTP_USERNAME: databot@wm.com
       SMTP_PASSWORD: ${{ password }}
       ATTACHMENTS:
-      - path: ./knownVulnerabilities.csv
+      - path: ./output/knownVulnerabilities.csv
 
