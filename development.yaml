@@ -30,8 +30,6 @@ steps:
       - brakeman -o output/report.json
       - python3 bmparser.py output/report.json
       - python3 pullrequest.py output/vulnerabilites.csv
-    volumes:
-      - .codefresh/volume
 
   SendEmail:
     type: smtp
